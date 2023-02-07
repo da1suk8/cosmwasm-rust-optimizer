@@ -11,6 +11,9 @@ MACHINE=$(uname -m)
 SUFFIX=${MACHINE#x86_64}
 SUFFIX=${SUFFIX:+-$SUFFIX}
 
+echo -n "Info: "
+rustc --version
+
 echo "Info: RUSTC_WRAPPER=$RUSTC_WRAPPER"
 
 echo "Info: sccache stats before build"
