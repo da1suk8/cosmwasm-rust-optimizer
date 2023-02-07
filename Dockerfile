@@ -89,9 +89,6 @@ FROM rust:1.66.0-alpine as base-optimizer
 RUN apk update && \
   apk add --no-cache musl-dev
 
-# Setup Rust with Wasm support
-RUN rustup target add wasm32-unknown-unknown
-
 # Add wasm-opt
 COPY --from=builder /usr/local/bin/wasm-opt /usr/local/bin
 
@@ -103,6 +100,13 @@ FROM base-optimizer as rust-optimizer
 # Use sccache. Users can override this variable to disable caching.
 COPY --from=builder /usr/local/bin/sccache /usr/local/bin
 ENV RUSTC_WRAPPER=sccache
+
+# Set nightly
+RUN rustup install nightly
+RUN rustup default nightly
+
+# Setup Rust with Wasm support
+RUN rustup target add wasm32-unknown-unknown
 
 # Assume we mount the source code in /code
 WORKDIR /code
@@ -126,6 +130,6 @@ WORKDIR /code
 COPY --from=builder /usr/local/bin/optimize_workspace.sh /usr/local/bin
 COPY --from=builder /usr/local/bin/build_workspace /usr/local/bin
 
-ENTRYPOINT ["optimize_workspace.sh"]
+ENTRYPOINT ["optimize.sh"]
 # Default argument when none is provided
 CMD ["."]
